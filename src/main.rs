@@ -1,11 +1,19 @@
-#[macro_use]
-extern crate log;
-extern crate env_logger;
+#[macro_use] extern crate log;
+//#[macro_use] extern crate env_logger;
+#[macro_use] extern crate serde_derive;
+
+use actix_web::{web, App, HttpServer};
+use actix_web::client::Client;
 
 use colored::*;
 use std::env;
-use log::{info, debug, trace, warn};
+use log::{info, debug};
 use log::Level;
+
+mod handlers;
+use crate::handlers::index;
+use crate::handlers::echo;
+use crate::handlers::Parameters;
 
 // Defines the default port
 const DEFAULT_PORT: u16          = 9296;
@@ -16,22 +24,23 @@ const DEFAULT_WORKERS: usize     = 2;
 // Defines the url for the called service (calculator)
 const DEFAULT_CLIENT_URL: &str = "http://127.0.0.1:9596"; 
 
+
 // Displays intro banner
 fn intro() {
     println!("{}", "===========================================================".yellow().bold());
     println!("{}", "                    Bank v 0.1.0".yellow().bold());
     println!("{}", "===========================================================".yellow().bold());
     println!("{}", "   Please use env variables for configuration:".yellow().bold());
-    println!("{}", "       CALC_PORT=port number".yellow().bold());
-    println!("{}", "       CALC_WORKERS=workers for server".yellow().bold());
-    println!("{}", "       CALC_CLIENT_URL=url of called service".yellow().bold());
+    println!("{}", "       BANK_PORT=port number".yellow().bold());
+    println!("{}", "       BANK_WORKERS=workers for server".yellow().bold());
+    println!("{}", "       BANK_CLIENT_URL=url of called service".yellow().bold());
     println!("{}", "-----------------------------------------------------------");
     println!("Starting configuration......\n");
 }
 
 // Read env variable to configure port
 fn config_port() -> u16 {
-    let key = "CALC_PORT";
+    let key = "BANK_PORT";
     let mut port: u16 = DEFAULT_PORT;
     
     println!("- Port:");
@@ -60,13 +69,11 @@ fn config_port() -> u16 {
             return DEFAULT_PORT;
         }
     } 
-
-    return port;
 }
 
 // Read env variable to configure workers.
 fn config_workers() -> usize {
-    let key = "CALC_WORKERS";
+    let key = "BANK_WORKERS";
     let mut workers: usize = DEFAULT_WORKERS;
 
     println!("\n- Workers:");
@@ -99,7 +106,7 @@ fn config_workers() -> usize {
 
 // Read env variable to configure workers.
 fn config_called_service() -> String {
-    let key = "CALC_CLIENT_URL";
+    let key = "BANK_CLIENT_URL";
     let mut endpoint: String = DEFAULT_CLIENT_URL.to_string();
 
     println!("\n- Client URL:");
@@ -131,7 +138,7 @@ fn config_called_service() -> String {
     } 
 }
 
-fn main() {
+fn main() -> std::io::Result<()>  {
     env_logger::init();
 
     intro();
@@ -146,4 +153,25 @@ fn main() {
     if log_enabled!(Level::Debug) {
         debug!("Startting server");
     }
+
+    HttpServer::new(
+        || App::new()
+            //.data({Client::default(), endpoint})
+            .data(Parameters{
+                client: Client::default(), 
+                c_endpoint: "http://127.0.0.1:9596/".to_string(),
+            })
+            .service(
+                web::resource("/")
+                    .route(web::get().to(index))
+            ) // end service
+            .service(
+                web::resource("/echo/{message}")
+                .route(web::get().to_async(echo))
+            ) // end hello service
+            
+    ) // end http server
+    .workers(workers)
+    .bind(format!("127.0.0.1:{}", port))?
+    .run()
 }
