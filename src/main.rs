@@ -1,5 +1,11 @@
+#[macro_use]
+extern crate log;
+extern crate env_logger;
+
 use colored::*;
 use std::env;
+use log::{info, debug, trace, warn};
+use log::Level;
 
 // Defines the default port
 const DEFAULT_PORT: u16          = 9296;
@@ -126,7 +132,8 @@ fn config_called_service() -> String {
 }
 
 fn main() {
-    
+    env_logger::init();
+
     intro();
 
     let port = config_port();
@@ -135,4 +142,8 @@ fn main() {
 
     println!("{}", "-----------------------------------------------------------");
     println!("Starting server.... Press Ctrl-C to stop it.");
+
+    if log_enabled!(Level::Debug) {
+        debug!("Startting server");
+    }
 }
