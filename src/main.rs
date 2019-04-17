@@ -9,6 +9,7 @@ use colored::*;
 use std::env;
 use log::{info, debug};
 use log::Level;
+//use env_logger::Builder;
 
 mod handlers;
 use crate::handlers::index;
@@ -140,6 +141,9 @@ fn config_called_service() -> String {
 
 fn main() -> std::io::Result<()>  {
     env_logger::init();
+    /*Builder::new()
+        .parse(&env::var("BANK_LOG").unwrap_or_default())
+        .init();*/
 
     intro();
 
@@ -149,6 +153,7 @@ fn main() -> std::io::Result<()>  {
 
     println!("{}", "-----------------------------------------------------------");
     println!("Starting server.... Press Ctrl-C to stop it.");
+    info!("Starting server");
 
     if log_enabled!(Level::Debug) {
         debug!("Startting server");
@@ -160,6 +165,7 @@ fn main() -> std::io::Result<()>  {
             .data(Parameters{
                 client: Client::default(), 
                 c_endpoint: "http://127.0.0.1:9596/".to_string(),
+                //c_endpoint: endpoint,
             })
             .service(
                 web::resource("/")

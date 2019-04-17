@@ -2,6 +2,7 @@ use actix_web::{web, HttpResponse};
 use actix_web::client::Client;
 use actix_web::web::Path;
 use futures::{Future};
+use std::str;
 
 #[derive(Deserialize)]
 pub struct Number {
@@ -25,9 +26,10 @@ pub fn index() -> &'static str {
 
 // echo handler
 pub fn echo(parameters: web::Data<Parameters>, msg: Path<Echo>) -> impl Future<Item = HttpResponse, Error = ()> {
-    let mut endpoint = "http://127.0.0.1:9596/echo/".to_string();
+    let mut endpoint = parameters.c_endpoint.to_string();
+    endpoint.push_str(&"echo/".to_string());
     endpoint.push_str(&msg.message);
-    println!("Endpoint: {}", endpoint);
+    debug!("Calling endpoint: {}", endpoint);
 
     parameters.client.get(endpoint)   // <- Create request builder
             .header("User-Agent", "Actix-web")
@@ -37,7 +39,7 @@ pub fn echo(parameters: web::Data<Parameters>, msg: Path<Echo>) -> impl Future<I
             //.map_err(Error::from)
             .and_then(|mut response| {
                     response.body().and_then( |body| {
-                        println!("{:?}", body);
+                        debug!("Received from endpoint: {}", str::from_utf8(&body).unwrap());
                         Ok(HttpResponse::Ok().body(body))
                     }).map_err(|_| ())
                 }).map_err(|_| ())
