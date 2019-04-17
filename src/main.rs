@@ -13,7 +13,8 @@ use log::Level;
 
 mod handlers;
 use crate::handlers::index;
-use crate::handlers::echo;
+use crate::handlers::echo_handler;
+use crate::handlers::factorial_iter_handler;
 use crate::handlers::Parameters;
 
 // Defines the default port
@@ -173,7 +174,11 @@ fn main() -> std::io::Result<()>  {
             ) // end service
             .service(
                 web::resource("/echo/{message}")
-                .route(web::get().to_async(echo))
+                .route(web::get().to_async(echo_handler))
+            ) // end hello service
+            .service(
+                web::resource("factorialIterative/{number}")
+                .route(web::get().to_async(factorial_iter_handler))
             ) // end hello service
             
     ) // end http server
