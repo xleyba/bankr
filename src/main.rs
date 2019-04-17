@@ -15,6 +15,7 @@ mod handlers;
 use crate::handlers::index;
 use crate::handlers::echo_handler;
 use crate::handlers::factorial_iter_handler;
+use crate::handlers::factorial_recur_handler;
 use crate::handlers::Parameters;
 
 // Defines the default port
@@ -179,7 +180,11 @@ fn main() -> std::io::Result<()>  {
             .service(
                 web::resource("factorialIterative/{number}")
                 .route(web::get().to_async(factorial_iter_handler))
-            ) // end hello service
+            ) // end iter service
+            .service(
+                web::resource("factorialRecursive/{number}")
+                .route(web::get().to_async(factorial_recur_handler))
+            ) // end recur service
             
     ) // end http server
     .workers(workers)
