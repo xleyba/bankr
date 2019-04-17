@@ -3,5 +3,16 @@ name = "bank"
 version = "0.1.0"
 authors = ["xleyba <xleyba@users.noreply.github.com>"]
 edition = "2018"
+publish = false
 
 [dependencies]
+actix-rt = "0.2"
+actix-web = { version="1.0.0-alpha.6" }
+actix = "0.8.0"
+
+colored = "1.7"
+log = "0.4.6"
+env_logger = "0.6.1"
+futures = "0.1"
+serde = "1.0.90"
+serde_derive = "1.0.90"
