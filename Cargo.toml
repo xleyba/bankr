@@ -1,5 +1,5 @@
 [package]
-name = "bank"
+name = "bankr"
 version = "0.1.0"
 authors = ["xleyba <xleyba@users.noreply.github.com>"]
 edition = "2018"
@@ -16,3 +16,4 @@ env_logger = "0.6.1"
 futures = "0.1"
 serde = "1.0.90"
 serde_derive = "1.0.90"
+envy = "0.4.0"
