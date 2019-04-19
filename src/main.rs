@@ -44,7 +44,7 @@ struct ConfigCalledService {
 // Displays intro banner
 fn intro() {
     println!("{}", "===========================================================".yellow().bold());
-    println!("{}", "                    Bank v 0.1.0".yellow().bold());
+    println!("{}", "                    Bank v 0.2.0".yellow().bold());
     println!("{}", "===========================================================".yellow().bold());
     println!("{}", "   Please use env variables for configuration:".yellow().bold());
     println!("{}", "       BANK_PORT=port number".yellow().bold());
