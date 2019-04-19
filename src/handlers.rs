@@ -19,6 +19,7 @@ pub struct Parameters {
     pub c_endpoint: String,
 }
 
+
 // Handle index route
 pub fn index() -> &'static str {
     "Hello world!\r\n"
@@ -29,7 +30,7 @@ pub fn echo_handler(parameters: web::Data<Parameters>, msg: Path<Echo>) ->
     impl Future<Item = HttpResponse, Error = ()> {
 
     let mut endpoint = parameters.c_endpoint.to_string();
-    endpoint.push_str(&"echo/".to_string());
+    endpoint.push_str(&"/echo/".to_string());
     endpoint.push_str(&msg.message);
     debug!("Calling endpoint: {}", endpoint);
 
@@ -37,14 +38,21 @@ pub fn echo_handler(parameters: web::Data<Parameters>, msg: Path<Echo>) ->
             .header("User-Agent", "Actix-web")
             //.finish().unwrap()
             .send()                               // <- Send http request
-            .map_err(|_| ())
+            .map_err(|err| {
+                error!("error 1 = {:?}", err);
+            })
             //.map_err(Error::from)
             .and_then(|mut response| {
                     response.body().and_then( |body| {
                         debug!("Received from endpoint: {}", str::from_utf8(&body).unwrap());
                         Ok(HttpResponse::Ok().body(body))
-                    }).map_err(|_| ())
-                }).map_err(|_| ())
+                    }).map_err(|err| {
+                        error!("error 2 = {:?}", err);
+                    })
+                //}).map_err(|_| ())
+            }).map_err(|err| {
+                 error!("error 3 = {:?}", err);
+            })
 } 
 
 /// Calls to iter factorial service
@@ -52,7 +60,7 @@ pub fn factorial_iter_handler(parameters: web::Data<Parameters>, number: Path<Nu
     impl Future<Item = HttpResponse, Error = ()> {
     
     let mut endpoint = parameters.c_endpoint.to_string();
-    endpoint.push_str(&"factorialIterative/".to_string());
+    endpoint.push_str(&"/factorialIterative/".to_string());
     endpoint.push_str(&number.number.to_string());
     debug!("Calling endpoint: {}", endpoint);
 
@@ -75,7 +83,7 @@ pub fn factorial_recur_handler(parameters: web::Data<Parameters>, number: Path<N
     impl Future<Item = HttpResponse, Error = ()> {
     
     let mut endpoint = parameters.c_endpoint.to_string();
-    endpoint.push_str(&"factorialRecursive/".to_string());
+    endpoint.push_str(&"/factorialRecursive/".to_string());
     endpoint.push_str(&number.number.to_string());
     debug!("Calling endpoint: {}", endpoint);
 
